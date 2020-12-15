@@ -65,8 +65,13 @@ namespace IROApps.PortForwarding.ServerApp
                         {
                             foreach (var pair in respInfo.Headers)
                             {
-                                if (pair.Key== "Transfer-Encoding")
+                                if (pair.Key == "Transfer-Encoding")
                                     continue;
+                                if (pair.Key == "Location")
+                                {
+                                    ctx.Response.Redirect(pair.Value.First());
+                                    continue;
+                                }
                                 var sv = new StringValues(pair.Value.ToArray());
                                 ctx.Response.Headers[pair.Key] = sv;
                             }
