@@ -35,7 +35,7 @@ namespace IROApps.PortForwarding.ClientApp
                 $"{commandObj.Server}/portforwarding/getPendingRequests?adminkey={commandObj.AdminKey}";
             _setPortsEndpoint = $"{commandObj.Server}/portforwarding/setResponse?adminkey={commandObj.AdminKey}";
             var clientHandler = new HttpClientHandler();
-            //clientHandler.AllowAutoRedirect = true;
+            clientHandler.AllowAutoRedirect = false;
             //clientHandler.MaxAutomaticRedirections = 10;
             _client = new HttpClient(clientHandler);
 

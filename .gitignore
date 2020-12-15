@@ -1,4 +1,4 @@
-
+Builded
 #Ignore thumbnails created by Windows
 Thumbs.db
 #Ignore files built by Visual Studio
@@ -34,6 +34,7 @@ packages/
 
 #resources
 **/Resources/Resource.Designer.cs
+
 
 #Custom
 output/
