@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using IRO.Mvc.Core;
 using IRO.Mvc.Core.Dto;
-using IROApps.PortForwarding.Dto;
+using IROApps.PortForwarding.ServerApp.Dto;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
-namespace IROApps.PortForwarding
+namespace IROApps.PortForwarding.ServerApp
 {
     public static class CatchRequestsMiddleware
     {
@@ -61,13 +58,19 @@ namespace IROApps.PortForwarding
                     else
                     {
                         ctx.Response.StatusCode = respInfo.StatusCode;
-                        foreach (var pair in respInfo.Headers)
+                        if (respInfo.Headers != null)
                         {
-                            ctx.Response.Headers[pair.Key] = pair.Value;
+                            foreach (var pair in respInfo.Headers)
+                            {
+                                ctx.Response.Headers[pair.Key] = pair.Value;
+                            }
                         }
-                        ctx.Response.ContentType = respInfo.ContentType;
-                        ctx.Response.StatusCode = respInfo.StatusCode;
-                        await ctx.Response.WriteAsync(respInfo.BodyText);
+                        if (respInfo.ContentType != null)
+                            ctx.Response.ContentType = respInfo.ContentType;
+                        if (respInfo.StatusCode != 0)
+                            ctx.Response.StatusCode = respInfo.StatusCode;
+                        if (respInfo.BodyText != null)
+                            await ctx.Response.WriteAsync(respInfo.BodyText);
                     }
 
                 }

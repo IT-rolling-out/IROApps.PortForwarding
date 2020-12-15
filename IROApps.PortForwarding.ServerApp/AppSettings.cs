@@ -1,7 +1,7 @@
 using System;
 using Microsoft.Extensions.Configuration;
 
-namespace IROApps.PortForwarding
+namespace IROApps.PortForwarding.ServerApp
 {
     public static class AppSettings
     {
