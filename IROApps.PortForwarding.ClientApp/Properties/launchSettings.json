@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "IROApps.PortForwarding.ClientApp": {
+      "commandName": "Project",
+      "commandLineArgs": "/AddressTo https://google.com /Server https://localhost:5001 /AdminKey pass"
+    }
+  }
+}
