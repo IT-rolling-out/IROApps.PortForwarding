@@ -10,8 +10,8 @@ Files not supported.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/IT-rolling-out/IROApps.PortForwarding)
 
-2. Build `IROApps.PortForwarding.ClientApp` and launch it with current arguments:
+2. Download client app from `Builded` folder and launch:
 
-`/AddressTo https://localhost:5001 /Server https://your-app.heroku.com /AdminKey pass`
+`dotnet IROApps.PortForwarding.ClientApp.dll /AddressTo https://localhost:5001 /Server https://your-app.heroku.com /AdminKey pass`
 
 Where `AddressTo` - your local address and `Server` - your heroku application.

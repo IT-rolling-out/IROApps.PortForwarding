@@ -22,7 +22,7 @@
     "ClientHeroku": {
       "Projects": {
         "IROApps.PortForwarding.ClientApp": {
-          "CommandLineArguments": "/AddressTo https://localhost:5001 /Server https://iroapps-port-forwarding.herokuapp.com/ /AdminKey pass"
+          "CommandLineArguments": "/AddressTo https://localhost:5001 /Server https://iroapps-port-forwarding.herokuapp.com /AdminKey pass"
         }
       }
     }
