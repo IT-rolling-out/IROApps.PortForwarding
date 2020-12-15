@@ -1,7 +1,7 @@
 {
 	"name": "Port forwarding",
 	"description": "Your own webhooks server, analog of ngrok for heroku.",
-	"repository": "https://github.com/ExtremeDotneting/BattleshipNetCore",
+	"repository": "https://github.com/IT-rolling-out/IROApps.PortForwarding",
 	"buildpacks": [{
 		"url": "https://github.com/jincod/dotnetcore-buildpack"
 	}],
