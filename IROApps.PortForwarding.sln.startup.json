@@ -14,9 +14,19 @@
       "Projects": {
         "IROApps.PortForwarding.ServerApp": {},
         "IROApps.PortForwarding.ClientApp": {
-          "CommandLineArguments": "/AddressTo https://google.com /Server https://localhost:5001 /AdminKey pass"
+          "CommandLineArguments": "/AddressTo https://localhost:5001 /Server https://localhost:6001 /AdminKey pass"
+        }
+      }
+    },
+
+    "ClientHeroku": {
+      "Projects": {
+        "IROApps.PortForwarding.ClientApp": {
+          "CommandLineArguments": "/AddressTo https://localhost:5001 /Server https://iroapps-port-forwarding.herokuapp.com/ /AdminKey pass"
         }
       }
     }
   }
+
+
 }

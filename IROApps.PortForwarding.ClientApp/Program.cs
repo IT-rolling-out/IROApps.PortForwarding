@@ -34,7 +34,13 @@ namespace IROApps.PortForwarding.ClientApp
             _getPendingRequestsEndpoint =
                 $"{commandObj.Server}/portforwarding/getPendingRequests?adminkey={commandObj.AdminKey}";
             _setPortsEndpoint = $"{commandObj.Server}/portforwarding/setResponse?adminkey={commandObj.AdminKey}";
-            _client = new HttpClient();
+            var clientHandler = new HttpClientHandler();
+            //clientHandler.AllowAutoRedirect = true;
+            //clientHandler.MaxAutomaticRedirections = 10;
+            _client = new HttpClient(clientHandler);
+
+
+
             _addressTo = commandObj.AddressTo;
 
             Console.WriteLine($"Listening.\n  Address to: {_addressTo}\n  Server: {commandObj.Server}.");
@@ -81,11 +87,11 @@ namespace IROApps.PortForwarding.ClientApp
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Error in request {pair.Key}.\n{ex}");
+                    Console.WriteLine($"Error in request {pair.Key}.\n{ex}");
                 }
 
             }
-            
+
         }
 
         static async Task<HttpContextInfo.ResponseInfo> HandlePendingRequest(HttpContextInfo.RequestInfo req)
@@ -98,47 +104,41 @@ namespace IROApps.PortForwarding.ClientApp
                 reqUrl += "?";
                 foreach (var queryItem in req.QueryParameters)
                 {
-                    reqUrl += $"{queryItem.Key}={queryItem.Value}";
+                    reqUrl += $"{queryItem.Key}={queryItem.Value.First()}";
                 }
             }
 
             reqMsg.RequestUri = new Uri(reqUrl);
-            foreach (var header in req.Headers)
+            if (!string.IsNullOrWhiteSpace(req.BodyText))
             {
-                reqMsg.Content = new StringContent(req.BodyText);
-                reqMsg.Content.Headers.TryAddWithoutValidation(header.Key, new string[] { header.Value });
+                var content = new StringContent(req.BodyText);
+                foreach (var header in req.Headers)
+                {
+                    content.Headers.TryAddWithoutValidation(header.Key,  header.Value);
+                }
+                content.Headers.ContentType.MediaType = req.ContentType;
+                reqMsg.Content = content;
             }
 
-            await Task.Delay(1000);
+            var respMsg = await _client.SendAsync(reqMsg);
             var respInfo = new HttpContextInfo.ResponseInfo();
-
+            respInfo.ContentType = respMsg.Content.Headers.ContentType?.MediaType;
+            respInfo.ContentLength = respMsg.Content.Headers.ContentLength ?? 0;
+            respInfo.Headers = new Dictionary<string, IEnumerable<string>>();
+            foreach (var header in respMsg.Headers)
+            {
+                respInfo.Headers[header.Key] = header.Value;
+            }
             try
             {
-                var respMsg = await _client.SendAsync(reqMsg);
-
-                respInfo.ContentType = respMsg.Content.Headers.ContentType?.MediaType;
-                respInfo.ContentLength = respMsg.Content.Headers.ContentLength ?? 0;
-                respInfo.Headers = new Dictionary<string, StringValues>();
-                foreach (var header in respMsg.Headers)
-                {
-                    respInfo.Headers[header.Key] = header.Value.First();
-                }
-
-                try
-                {
-                    respInfo.BodyText = await respMsg.Content.ReadAsStringAsync();
-                }
-                catch
-                {
-                    // ignored
-                }
-
-                respInfo.StatusCode = (int) respMsg.StatusCode;
+                respInfo.BodyText = await respMsg.Content.ReadAsStringAsync();
             }
             catch
             {
                 // ignored
             }
+
+            respInfo.StatusCode = (int)respMsg.StatusCode;
 
             return respInfo;
         }

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using IRO.Mvc.Core;
 using IRO.Mvc.Core.Dto;
 using IROApps.PortForwarding.ServerApp.Dto;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 
 namespace IROApps.PortForwarding.ServerApp
@@ -28,6 +30,7 @@ namespace IROApps.PortForwarding.ServerApp
                 try
                 {
                     var contextInfo = await ctx.ResolveInfo();
+                    var copy = JsonConvert.DeserializeObject<HttpContextInfo>(JsonConvert.SerializeObject(contextInfo));
                     if (contextInfo.Request.Path.StartsWith("/portforwarding/getPendingRequests"))
                     {
                         await GetPendingRequests(ctx);
@@ -62,7 +65,10 @@ namespace IROApps.PortForwarding.ServerApp
                         {
                             foreach (var pair in respInfo.Headers)
                             {
-                                ctx.Response.Headers[pair.Key] = pair.Value;
+                                if (pair.Key== "Transfer-Encoding")
+                                    continue;
+                                var sv = new StringValues(pair.Value.ToArray());
+                                ctx.Response.Headers[pair.Key] = sv;
                             }
                         }
                         if (respInfo.ContentType != null)
@@ -104,10 +110,10 @@ namespace IROApps.PortForwarding.ServerApp
             {
                 throw new Exception("Admin key is wrong.");
             }
-            var jsonStr=await ctx.GetRequestBodyText();
-            
+            var jsonStr = await ctx.GetRequestBodyText();
+
             var dto = JsonConvert.DeserializeObject<SetResponseDto>(jsonStr);
-            var req=PendingReqDict[dto.Id];
+            var req = PendingReqDict[dto.Id];
             PendingRespDict[dto.Id] = dto.Resp;
             ctx.Response.StatusCode = 200;
         }
