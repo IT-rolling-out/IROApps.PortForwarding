@@ -75,6 +75,7 @@ namespace IROApps.PortForwarding
                 {
                     ctx.Response.StatusCode = 500;
                     await ctx.Response.WriteAsync($"Port forwarding server internal error.\n{ex}");
+                    await next();
                 }
             });
 
