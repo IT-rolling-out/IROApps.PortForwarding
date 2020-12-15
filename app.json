@@ -10,9 +10,9 @@
 			"description": "Parameter for authoriztion on server.",
 			"value": "pass"
 		},
-		"PROJECT_FILE": {
-			"description": "Hetokuy variable",
-			"value": "IROApps.PortForwarding.ServerApp.csproj"
+		"PROJECT_NAME": {
+			"description": "Herokuy variable",
+			"value": "IROApps.PortForwarding.ServerApp"
 		}
 	}
 }
