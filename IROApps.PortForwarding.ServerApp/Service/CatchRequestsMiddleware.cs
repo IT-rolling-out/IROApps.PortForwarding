@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 
-namespace IROApps.PortForwarding.ServerApp
+namespace IROApps.PortForwarding.ServerApp.Service
 {
     public static class CatchRequestsMiddleware
     {

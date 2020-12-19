@@ -1,4 +1,5 @@
 using IRO.Mvc.Core;
+using IROApps.PortForwarding.ServerApp.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -21,29 +22,28 @@ namespace IROApps.PortForwarding.ServerApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseMiddleware<RewindHttpStreamsMiddleware>();
-            app.UseCatchRequestsMiddleware();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/chathub");
             });
+
+            app.UseMiddleware<RewindHttpStreamsMiddleware>();
+            app.UseCatchRequestsMiddleware();
         }
     }
 }

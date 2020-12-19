@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using IRO.Mvc.Core.Dto;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 
@@ -15,8 +16,10 @@ namespace IROApps.PortForwarding.ClientApp
     {
         static string _setPortsEndpoint;
         static string _getPendingRequestsEndpoint;
+        static string _getPendingRequestsSignalREndpoint;
         static HttpClient _client;
         static string _addressTo;
+        static HubConnection _signalRConnection;
 
         static void Main(string[] args)
         {
@@ -33,6 +36,7 @@ namespace IROApps.PortForwarding.ClientApp
 
             _getPendingRequestsEndpoint =
                 $"{commandObj.Server}/portforwarding/getPendingRequests?adminkey={commandObj.AdminKey}";
+            _getPendingRequestsSignalREndpoint = $"{commandObj.Server}/portforwarding/getPendingRequestsSignalR";
             _setPortsEndpoint = $"{commandObj.Server}/portforwarding/setResponse?adminkey={commandObj.AdminKey}";
             var clientHandler = new HttpClientHandler();
             clientHandler.AllowAutoRedirect = false;
@@ -45,22 +49,27 @@ namespace IROApps.PortForwarding.ClientApp
 
             Console.WriteLine($"Listening.\n  Address to: {_addressTo}\n  Server: {commandObj.Server}.");
 
-            Task.Run(async () =>
-            {
-                while (true)
-                {
-                    try
-                    {
-                        await CheckRequests();
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"Error resolving pending requests.\n{ex}");
-                    }
+            InitSignalR().Wait();
+            //_signalRConnection.InvokeAsync("SendMessage",
+            //    "", "");
 
-                    await Task.Delay(100);
-                }
-            });
+            //Task.Run(async () =>
+            //{
+            //    while (true)
+            //    {
+            //        try
+            //        {
+            //            //await CheckRequests();
+            //            await CheckRequests_SignalR();
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            Debug.WriteLine($"Error resolving pending requests.\n{ex}");
+            //        }
+
+            //        await Task.Delay(100);
+            //    }
+            //});
             while (true)
             {
                 Console.ReadLine();
@@ -94,6 +103,20 @@ namespace IROApps.PortForwarding.ClientApp
 
         }
 
+        static async Task CheckRequests_SignalR()
+        {
+           
+        }
+
+        static async Task InitSignalR()
+        {
+            var builder = new HubConnectionBuilder();
+            builder
+                .WithUrl("https://localhost:6001/chathub");
+            _signalRConnection = builder.Build();
+            await _signalRConnection.StartAsync();
+        }
+
         static async Task<HttpContextInfo.ResponseInfo> HandlePendingRequest(HttpContextInfo.RequestInfo req)
         {
             var reqMsg = new HttpRequestMessage();
@@ -104,8 +127,10 @@ namespace IROApps.PortForwarding.ClientApp
                 reqUrl += "?";
                 foreach (var queryItem in req.QueryParameters)
                 {
-                    reqUrl += $"{queryItem.Key}={queryItem.Value.First()}";
+                    reqUrl += $"{queryItem.Key}={queryItem.Value.First()}&";
                 }
+
+                reqUrl = reqUrl.Remove(reqUrl.Length - 1);
             }
 
             reqMsg.RequestUri = new Uri(reqUrl);
@@ -114,7 +139,7 @@ namespace IROApps.PortForwarding.ClientApp
                 var content = new StringContent(req.BodyText);
                 foreach (var header in req.Headers)
                 {
-                    content.Headers.TryAddWithoutValidation(header.Key,  header.Value);
+                    content.Headers.TryAddWithoutValidation(header.Key, header.Value);
                 }
                 content.Headers.ContentType.MediaType = req.ContentType;
                 reqMsg.Content = content;
