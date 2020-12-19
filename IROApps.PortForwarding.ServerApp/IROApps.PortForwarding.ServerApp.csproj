@@ -5,9 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IRO.Mvc.Core" Version="1.2.10" />
+    <PackageReference Include="IRO.Mvc.Core" Version="1.2.11" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="4.0.11" />
   </ItemGroup>
 
 
