@@ -9,7 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IRO.Mvc.Core" Version="1.2.10" />
+    <PackageReference Include="IRO.Mvc.Core" Version="1.2.10" >
+      <NoWarn>NU1605</NoWarn>
+    </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
   </ItemGroup>
 
