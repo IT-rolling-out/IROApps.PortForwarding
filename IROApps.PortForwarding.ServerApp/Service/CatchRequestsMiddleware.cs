@@ -8,6 +8,8 @@ using IRO.Mvc.Core.Dto;
 using IROApps.PortForwarding.ServerApp.Dto;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 
@@ -44,6 +46,14 @@ namespace IROApps.PortForwarding.ServerApp.Service
 
                     var reqId = Guid.NewGuid();
                     PendingReqDict[reqId] = contextInfo.Request;
+
+                    var hub = ctx.RequestServices.GetRequiredService<IHubContext<PendingRequestsHub>>();
+                    await hub.Clients.All.SendAsync("PendingRequest", new RequestDto()
+                    {
+                        Id = reqId,
+                        Req = contextInfo.Request
+                    });
+
                     HttpContextInfo.ResponseInfo respInfo = null;
                     var startWaitAt = DateTime.UtcNow;
                     while (respInfo == null && DateTime.UtcNow - startWaitAt < AppSettings.RequestExpireTime)

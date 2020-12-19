@@ -1,18 +1,15 @@
 ﻿using System.Threading.Tasks;
+using IRO.Mvc.Core.Dto;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 
 namespace IROApps.PortForwarding.ServerApp.Service
 {
-    public class ChatHub : Hub
+    public class PendingRequestsHub : Hub
     {
         public override Task OnConnectedAsync()
         {
             return base.OnConnectedAsync();
-        }
-
-        public async Task SendMessage(string user, string message)
-        {
-            await Clients.All.SendAsync("ReceiveMessage", user, message);
         }
     }
 }

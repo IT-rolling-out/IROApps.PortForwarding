@@ -36,84 +36,45 @@ namespace IROApps.PortForwarding.ClientApp
 
             _getPendingRequestsEndpoint =
                 $"{commandObj.Server}/portforwarding/getPendingRequests?adminkey={commandObj.AdminKey}";
-            _getPendingRequestsSignalREndpoint = $"{commandObj.Server}/portforwarding/getPendingRequestsSignalR";
+            _getPendingRequestsSignalREndpoint = $"{commandObj.Server}/portforwardingGetPendingRequestsSignalR";
             _setPortsEndpoint = $"{commandObj.Server}/portforwarding/setResponse?adminkey={commandObj.AdminKey}";
             var clientHandler = new HttpClientHandler();
             clientHandler.AllowAutoRedirect = false;
-            //clientHandler.MaxAutomaticRedirections = 10;
             _client = new HttpClient(clientHandler);
-
-
-
             _addressTo = commandObj.AddressTo;
 
             Console.WriteLine($"Listening.\n  Address to: {_addressTo}\n  Server: {commandObj.Server}.");
 
-            InitSignalR().Wait();
-            //_signalRConnection.InvokeAsync("SendMessage",
-            //    "", "");
+            StartSignalR();
 
-            //Task.Run(async () =>
-            //{
-            //    while (true)
-            //    {
-            //        try
-            //        {
-            //            //await CheckRequests();
-            //            await CheckRequests_SignalR();
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            Debug.WriteLine($"Error resolving pending requests.\n{ex}");
-            //        }
-
-            //        await Task.Delay(100);
-            //    }
-            //});
             while (true)
             {
                 Console.ReadLine();
             }
         }
 
-        static async Task CheckRequests()
-        {
-            var resp = await _client.GetAsync(_getPendingRequestsEndpoint);
-            var text = await resp.Content.ReadAsStringAsync();
-            var pendingRequests = JsonConvert.DeserializeObject<Dictionary<Guid, HttpContextInfo.RequestInfo>>(text);
-            if (pendingRequests == null)
-            {
-                pendingRequests = new Dictionary<Guid, HttpContextInfo.RequestInfo>();
-            }
-
-            foreach (var pair in pendingRequests)
-            {
-                try
-                {
-                    var respInfo = await HandlePendingRequest(pair.Value);
-                    await SendResponseOfPending(pair.Key, respInfo);
-                    await Task.Delay(10);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error in request {pair.Key}.\n{ex}");
-                }
-
-            }
-
-        }
-
-        static async Task CheckRequests_SignalR()
-        {
-           
-        }
-
-        static async Task InitSignalR()
+        static async Task StartSignalR()
         {
             var builder = new HubConnectionBuilder();
             builder
-                .WithUrl("https://localhost:6001/chathub");
+                .WithAutomaticReconnect()
+                .WithUrl(_getPendingRequestsSignalREndpoint);
             _signalRConnection = builder.Build();
+            _signalRConnection.On("PendingRequest",
+                async (RequestDto reqDto) =>
+                {
+                    try
+                    {
+                        var respInfo = await HandlePendingRequest(reqDto.Req);
+                        await SendResponseOfPending(reqDto.Id, respInfo);
+                        await Task.Delay(10);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error in request {reqDto.Id}.\n{ex}");
+                    }
+
+                });
             await _signalRConnection.StartAsync();
         }
 

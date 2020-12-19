@@ -39,7 +39,7 @@ namespace IROApps.PortForwarding.ServerApp
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<ChatHub>("/chathub");
+                endpoints.MapHub<PendingRequestsHub>("/portforwardingGetPendingRequestsSignalR");
             });
 
             app.UseMiddleware<RewindHttpStreamsMiddleware>();
