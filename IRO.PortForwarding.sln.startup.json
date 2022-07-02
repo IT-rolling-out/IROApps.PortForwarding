@@ -1,0 +1,32 @@
+/*
+    This is a configuration file for the SwitchStartupProject Visual Studio Extension
+    See https://heptapod.host/thirteen/switchstartupproject/blob/branch/current/Configuration.md
+*/
+{
+  /*  Configuration File Version  */
+  "Version": 3,
+
+  /*  Create an item in the dropdown list for each project in the solution?  */
+  "ListAllProjects": true,
+
+  "MultiProjectConfigurations": {
+    "All": {
+      "Projects": {
+        "IRO.PortForwarding.ServerApp": {},
+        "IRO.PortForwarding.ClientApp": {
+          "CommandLineArguments": "/AddressTo https://localhost:5001 /Server https://localhost:7001 /AdminKey pass"
+        }
+      }
+    },
+
+    "ClientHeroku": {
+      "Projects": {
+        "IRO.PortForwarding.ClientApp": {
+          "CommandLineArguments": "/AddressTo https://localhost:5001 /Server https://IRO-port-forwarding.herokuapp.com /AdminKey pass"
+        }
+      }
+    }
+  }
+
+
+}

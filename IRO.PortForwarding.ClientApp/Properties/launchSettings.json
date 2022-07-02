@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "IRO.PortForwarding.ClientApp": {
+      "commandName": "Project",
+      "commandLineArgs": "/AddressTo https://localhost:5001 /Server https://IRO-port-forwarding.herokuapp.com /AdminKey pass"
+    }
+  }
+}

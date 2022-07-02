@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "IROApps.PortForwarding.ClientApp": {
-      "commandName": "Project",
-      "commandLineArgs": "/AddressTo https://localhost:5001 /Server https://localhost:7001 /AdminKey pass"
-    }
-  }
-}
